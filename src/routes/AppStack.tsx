@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Profile from '../screens/Profile';
@@ -16,12 +16,12 @@ const AppStack = () => {
 
             if (route.name === 'Home') {
               iconName = focused
-                ? 'albums'
-                : 'albums-outline';
+                ? 'home'
+                : 'home-outline';
             } else if (route.name === 'Profile') {
-              iconName = focused ? 'baseball' : 'baseball-outline';
+              iconName = focused ? 'person' : 'person-outline';
             }else if(route.name === 'Events'){
-              iconName = focused ? 'beer' : 'beer-outline';
+              iconName = focused ? 'ribbon' : 'ribbon-outline';
             }
 
             // You can return any component that you like here!
@@ -34,6 +34,26 @@ const AppStack = () => {
         <Tab.Screen 
           name="Home" 
           component={Blogs} 
+          options={({ navigation }) => ({
+            headerRight : (props) => (
+              <TouchableOpacity
+              style={{marginRight : 20}}
+                {...props}
+                onPress={() => {
+                  // Navigate to the Add Blog screen
+                  navigation.navigate('AddBlog');
+                }}
+              >
+                <Ionicons name="add" size={24} color="black" />
+              </TouchableOpacity>
+            ),
+          
+          })}
+          
+        />
+        {/* <Tab.Screen 
+          name="Home" 
+          component={AddBlog} 
           options={{
             headerTitle: 'Alumini-Econnect', 
             headerTitleAlign: 'center',
@@ -42,7 +62,7 @@ const AppStack = () => {
               color : '#2d545e'
             }
           }} 
-        />
+        /> */}
         <Tab.Screen name="Events" component={Events} />
         <Tab.Screen name="Profile" component={Profile} />
       </Tab.Navigator>

@@ -9,18 +9,12 @@ import NoContent from './NoContent';
 const Blogs = ({navigation} : any) => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const getBlogs = async()=>{
-    try {
-      const data : Blog[]  = await blogsService.getBlogs();
-      setBlogs(data);
-    } catch (error) {
-      console.error(error);
-    }
-  }
+
   useEffect(() => {
     // IIFE to handle async inside useEffect
     (async () => {
       try {
+        console.log("Date : ", Date());
         const data: Blog[] = await blogsService.getBlogs();
         setBlogs(data);
         setIsLoading(false)
@@ -40,8 +34,9 @@ const Blogs = ({navigation} : any) => {
   return (
 
     <ScrollView style={styles.container}>
+      {/* <Text>Hello world</Text> */}
       {blogs != null && blogs.length > 0 && blogs.map((blog) => (
-        <BlogCard key={blog.id} id={blog.id} description={blog.description} imageUrl={blog.imageUrls[0]} navigation={navigation} />
+        <BlogCard key={blog.id} id={blog.id} description={blog.description} imageUrl={blog.imageUrls[0]} userProfilePictureUrl={blog.userProfilePictureUrl} createdByName={blog.createdByName} userProfileHeadLine={blog.userProfileHeadLine} createdOn={blog.createdOn} navigation={navigation} />
       ))}
       {blogs == null && <NoContent/>}
     </ScrollView>
@@ -53,7 +48,7 @@ export default Blogs
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    //padding: 16,
   },
     txt : {
         fontWeight:'bold',

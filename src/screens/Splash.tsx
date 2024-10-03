@@ -1,7 +1,7 @@
 // SplashScreen.js
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-
+import Ionicons from 'react-native-vector-icons/Ionicons'
 const Splash = ({ navigation } : any) => {
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -14,7 +14,9 @@ const Splash = ({ navigation } : any) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to My App!</Text>
+      <Ionicons name='logo-buffer' color='#2d545e' size={50}/>
+      <Text style={{fontWeight : 'bold',
+              color : '#2d545e'}}>Alumini-Econnect</Text>
       {/* You can add your logo or any other elements here */}
     </View>
   );
