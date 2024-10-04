@@ -1,62 +1,79 @@
-import { instance } from "./axiosInstance";
+import { AxiosInstance } from "axios";
+import { LoginForm, SignUpForm } from "../interfaces/auth";
+import useAxios from "./axiosInstance";
+import { useMemo } from "react";
+
 
 class AuthService{
-    async loginUser(formData){
+    instance : AxiosInstance
+
+    constructor(axiosInstance : AxiosInstance){
+        this.instance = axiosInstance;
+    }
+    async getCurrentUser(){
         try {
-            const {data} = await instance.post("Authorization", formData);
+            const {data} = await this.instance.get(`User/CurrentUser`);
+            return data;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    async loginUser(formData : LoginForm){
+        try {
+            const {data} = await this.instance.post("Authorization", formData);
             console.log("Token : ", data);
             return data;
         } catch (error) {
             console.error(error);
         }
     }
-    async registerUser(formData){
+    async registerUser(formData : SignUpForm){
         try {
-            const {data} = await instance.post("User/AddStudent", formData);
+            const {data} = await this.instance.post("User/AddStudent", formData);
             return data;
         } catch (error) {
             console.error(error);
         }
     }
 
-    async sendOTP(gmail, name){
+    async sendOTP(gmail : string, name : string){
         try {
-            const {data} = await instance.post(`User/SendOtp/${gmail}/${name}`);
+            const {data} = await this.instance.post(`User/SendOtp/${gmail}/${name}`);
             return data;
         } catch (error) {
             console.error(error);
         }
     }
-    async verifyOTP(gmail, otp){
+    async verifyOTP(gmail : string, otp : string){
         try {
-            const {data} = await instance.post(`User/Verify/${gmail}/${otp}`);
-            return data;
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    async getCollegeId(domain){
-        try {
-            const {data} = await instance.get(`College/GetCollegeByDomain/${domain}`);
+            const {data} = await this.instance.post(`User/Verify/${gmail}/${otp}`);
             return data;
         } catch (error) {
             console.error(error);
         }
     }
 
-    async getCollegeCourse(collegeId){
+    async getCollegeId(domain : string){
         try {
-            const {data} = await instance.get(`College/GetCourse${collegeId}`);
+            const {data} = await this.instance.get(`College/GetCollegeByDomain/${domain}`);
             return data;
         } catch (error) {
             console.error(error);
         }
     }
 
-    async getCollegeBranchUnderCourse(courseId){
+    async getCollegeCourse(collegeId : string){
         try {
-            const {data} = await instance.get(`College/GetBranchesUnderCollegeCourse/${courseId}`);
+            const {data} = await this.instance.get(`College/GetCourse${collegeId}`);
+            return data;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async getCollegeBranchUnderCourse(courseId : string){
+        try {
+            const {data} = await this.instance.get(`College/GetBranchesUnderCollegeCourse/${courseId}`);
             return data;
         } catch (error) {
             console.error(error);
@@ -66,5 +83,12 @@ class AuthService{
  
 }
 
-const authService = new AuthService();
-export {authService}
+const useAuthService = ()=>{
+    const axiosInstance = useAxios();
+
+  // useMemo to create the service instance only when axiosInstance changes
+  const authService = useMemo(() => new AuthService(axiosInstance), [axiosInstance]);
+
+  return authService;
+};
+export default useAuthService;

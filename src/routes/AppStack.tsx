@@ -5,6 +5,7 @@ import Profile from '../screens/Profile';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Events from '../screens/Events';
 import Blogs from '../screens/Blogs';
+import { Avatar, Image } from 'react-native-elements';
 
 const Tab = createBottomTabNavigator();
 const AppStack = () => {
@@ -35,6 +36,11 @@ const AppStack = () => {
           name="Home" 
           component={Blogs} 
           options={({ navigation }) => ({
+            headerLeft : (props) => (
+              <TouchableOpacity>
+                <Avatar/>
+              </TouchableOpacity>
+            ),
             headerRight : (props) => (
               <TouchableOpacity
               style={{marginRight : 20}}
@@ -47,7 +53,12 @@ const AppStack = () => {
                 <Ionicons name="add" size={24} color="black" />
               </TouchableOpacity>
             ),
-          
+            headerTitle:'Alumini-Econnect',
+            headerTitleStyle : {
+              fontWeight : 'bold',
+              color : '#2d545e',
+            },
+            headerTitleAlign : 'center'
           })}
           
         />

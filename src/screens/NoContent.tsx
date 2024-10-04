@@ -4,7 +4,7 @@ import React from 'react'
 const NoContent = () => {
   return (
     <View style={styles.container}>
-      <Text>NoContent</Text>
+      <Text style={{fontWeight : 'bold', color : '#2d545e', fontSize:20}}>NoContent</Text>
     </View>
   )
 }
@@ -15,6 +15,6 @@ const styles = StyleSheet.create({
     container : {
         flex : 1,
         justifyContent : 'center',
-        alignContent : 'center'
+        alignItems : 'center'
     }
 })

@@ -1,4 +1,6 @@
-export interface UserDetails {
+import { Role } from "./enums";
+
+export interface UserDetails{
     id: string;
     name: string;
     gmail: string;
@@ -25,3 +27,10 @@ export interface UserDetails {
     passoutYear: number;
   }
   
+export interface UserBasic{
+  id : string,
+  name : string,
+  role : Role,
+  imageUrl : string,
+  headLine : string,
+}

@@ -1,19 +1,12 @@
 import { IdAndName } from "./shared";
+import { UserBasic } from "./user";
 
 export interface Blog {
-    id: string;
-    description: string;
-    tags: {
-      id: string;
-      name: string;
-    }[];
-    imageUrls: string[];
-    createdByName: string;
-    userProfilePictureUrl: string;
-    userProfileHeadLine: string;
-    createdOn: string;
-    createdBy: string;
-    updatedOn?: string | null;
-    updatedBy?: string | null;
-  }
-  
+  id: string;
+  description: string;
+  tags: IdAndName[];
+  imageUrls: string[];
+  user: UserBasic;
+  createdOn: string;
+  updatedOn: string | null;
+}

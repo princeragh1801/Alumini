@@ -8,10 +8,11 @@ import EnumInput from '../components/Input/EnumInput';
 import { useNavigation } from '@react-navigation/native';
 import PrimaryButton from '../components/Button/PrimaryButton';
 import SecondaryButton from '../components/Button/SecondaryButton';
-import { authService } from '../services/authService';
+import { storeToken } from '../utils/token';
+import useAuthService from '../services/authService';
 
 const Login : React.FC = ({navigation} : any) => {
-
+  const authService = useAuthService();
   // refs
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
@@ -27,6 +28,11 @@ const Login : React.FC = ({navigation} : any) => {
     try {
       console.log("Data : ", data)
       const response = await authService.loginUser(data);
+      console.log("Response : ", response);
+      if(response != null){
+        await storeToken(response);
+        navigation.navigate('Router');
+      }
     } catch (error) {
       console.error(error);
     }

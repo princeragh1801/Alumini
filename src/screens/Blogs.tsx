@@ -1,23 +1,28 @@
-import { ActivityIndicator, Button, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { blogsService } from '../services/blogsService'
+import useBlogService from '../services/blogsService'
 import { Blog } from '../interfaces/blog';
 import { BlogCard } from '../components/Card/BlogCard';
 import Loading from './Loading';
 import NoContent from './NoContent';
+import { ApiResponse } from '../interfaces/response';
+import { showSuccess } from '../utils/toast';
 
 const Blogs = ({navigation} : any) => {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const blogsService = useBlogService()
+  const [blogs, setBlogs] = useState<Blog[]>();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // IIFE to handle async inside useEffect
     (async () => {
       try {
-        console.log("Date : ", Date());
-        const data: Blog[] = await blogsService.getBlogs();
-        setBlogs(data);
+        const data : ApiResponse<Blog[]> = await blogsService.getBlogs();
+        var response = data.data;
+        console.log("Blogs : ", response)
+        setBlogs(response);
         setIsLoading(false)
+        showSuccess(data.message)
       } catch (error) {
         console.error("Failed to fetch blogs:", error);
       }
@@ -30,15 +35,16 @@ const Blogs = ({navigation} : any) => {
     return (
       <Loading/>
     )
+  }else if(blogs == null || blogs.length == 0){
+    return <NoContent/>
   }
   return (
-
     <ScrollView style={styles.container}>
       {/* <Text>Hello world</Text> */}
       {blogs != null && blogs.length > 0 && blogs.map((blog) => (
-        <BlogCard key={blog.id} id={blog.id} description={blog.description} imageUrl={blog.imageUrls[0]} userProfilePictureUrl={blog.userProfilePictureUrl} createdByName={blog.createdByName} userProfileHeadLine={blog.userProfileHeadLine} createdOn={blog.createdOn} navigation={navigation} />
+        <BlogCard key={blog.id} blog={blog} navigation={navigation} />
       ))}
-      {blogs == null && <NoContent/>}
+      
     </ScrollView>
   )
 }
