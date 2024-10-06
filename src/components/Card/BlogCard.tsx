@@ -10,17 +10,6 @@ const stripHtml = (html: string) => {
   return html.replace(/<\/?[^>]+(>|$)/g, ""); // This will remove any HTML tags
 };
 
-// type Props = {
-//   id: string;
-//   description: string;
-//   imageUrl: string;
-//   createdByName: string;
-//   userProfilePictureUrl: string;
-//   userProfileHeadLine: string;
-//   createdOn: string;
-//   navigation: any;
-//   tags: string[];
-// };
 type props = {
   blog : Blog,
   navigation : any

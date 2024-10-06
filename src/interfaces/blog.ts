@@ -10,3 +10,9 @@ export interface Blog {
   createdOn: string;
   updatedOn: string | null;
 }
+
+export interface BlogForm {
+  description : string,
+  imageUrls : string[],
+  tags : string[]
+}

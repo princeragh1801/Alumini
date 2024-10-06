@@ -1,17 +1,18 @@
-import { Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { LoginForm } from '../interfaces/auth'
 import { Role } from '../interfaces/enums';
 import InputText from '../components/Input/InputText';
 import EnumInput from '../components/Input/EnumInput';
-import { useNavigation } from '@react-navigation/native';
 import PrimaryButton from '../components/Button/PrimaryButton';
 import SecondaryButton from '../components/Button/SecondaryButton';
-import { storeToken } from '../utils/token';
 import useAuthService from '../services/authService';
+import { useDispatch } from 'react-redux';
+import { storeToken } from '../utils/token';
 
 const Login : React.FC = ({navigation} : any) => {
+  //const dispatch = useDispatch();
   const authService = useAuthService();
   // refs
   const emailRef = useRef<TextInput>(null);
@@ -31,7 +32,7 @@ const Login : React.FC = ({navigation} : any) => {
       console.log("Response : ", response);
       if(response != null){
         await storeToken(response);
-        navigation.navigate('Router');
+        navigation.navigate('Home');
       }
     } catch (error) {
       console.error(error);

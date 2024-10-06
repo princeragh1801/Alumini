@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome'; // or any other icon library of your choice
 import { Event } from '../../interfaces/event';
+import { formatTime } from '../../utils/timeFormat';
 
 interface EventCardProps {
   event: Event;
@@ -9,29 +11,39 @@ interface EventCardProps {
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>{event.name}</Text>
-      <Text style={styles.description}>{event.description}</Text>
+      <Text style={styles.title}>{event.name.length > 30 ? `${event.name.substring(0, 27)}...` : event.name}</Text>
+      <Text style={styles.description}>{event.description.length > 60 ? `${event.description.substring(0, 57)}...` : event.description}</Text>
       
-      <Text style={styles.label}>Location:</Text>
-      <Text style={styles.info}>{event.location}</Text>
+      <View style={styles.infoContainer}>
+        <Icon name="map-marker" size={18} color="#d27511" />
+        <Text style={styles.info}>{event.location}</Text>
+      </View>
       
-      <Text style={styles.label}>Start Date:</Text>
-      <Text style={styles.info}>{new Date(event.startDate).toLocaleDateString()}</Text>
+      <View style={styles.infoContainer}>
+        <Icon name="calendar" size={18} color="#d27511" />
+        <Text style={styles.info}>{formatTime(event.startDate)}</Text>
+      </View>
 
-      <Text style={styles.label}>End Date:</Text>
-      <Text style={styles.info}>{new Date(event.endDate).toLocaleDateString()}</Text>
+      {/* <View style={styles.infoContainer}>
+        <Icon name="clock-o" size={18} color="#d27511" />
+        <Text style={styles.info}>{formatTime(event.endDate)}</Text>
+      </View> */}
 
-      <Text style={styles.label}>Registration Deadline:</Text>
-      <Text style={styles.info}>{new Date(event.registration_Deadline).toLocaleDateString()}</Text>
+      <View style={styles.infoContainer}>
+        <Icon name="calendar-minus-o" size={18} color="#d27511" />
+        <Text style={styles.info}>{formatTime(event.registration_Deadline)}</Text>
+      </View>
 
-      <Text style={styles.label}>Approved By:</Text>
-      <Text style={styles.info}>{event.approvedBy_Name}</Text>
+      <View style={styles.infoContainer}>
+        <Text style={styles.label}>Approved By:</Text>
+        <Text style={styles.info}>{event.approvedBy_Name || 'N/A'}</Text>
+      </View>
 
-      <Text style={styles.label}>Created By:</Text>
-      <Text style={styles.info}>{event.createdBy_Name}</Text>
+      <View style={styles.infoContainer}>
+        <Text style={styles.label}>Created By:</Text>
+        <Text style={styles.info}>{event.createdBy_Name || 'N/A'}</Text>
+      </View>
 
-      <Text style={styles.label}>Status:</Text>
-      <Text style={styles.info}>{event.status === 0 ? 'Pending' : 'Approved'}</Text>
     </View>
   );
 };
@@ -60,11 +72,19 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: 'bold',
-    marginTop: 8,
+    fontSize : 15,
+    //marginTop: 8,
   },
   info: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#666',
+    marginLeft : 15,
+    fontWeight : 'semibold'
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
   },
 });
 

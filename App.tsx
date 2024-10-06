@@ -8,12 +8,15 @@ import AddBlog from './src/screens/AddBlog';
 import {BlogDetails} from './src/screens/Details/BlogDetails';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Splash from './src/screens/Splash';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import { store } from './src/store/store';
+import { getToken } from './src/utils/token';
+import { setToken } from './src/store/tokenSlice';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
+  
   return (
     <Provider store={store}>
       <SafeAreaProvider>

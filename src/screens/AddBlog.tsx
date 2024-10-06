@@ -1,31 +1,74 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, FlatList, Modal, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useForm, Controller } from 'react-hook-form';
+import { ApiResponse } from '../interfaces/response';
+import { IdAndName } from '../interfaces/shared';
+import useTagService from '../services/tagService';
+import useBlogService from '../services/blogsService';
+import { BlogForm } from '../interfaces/blog';
+import useAuthService from '../services/authService';
 
 const AddBlog = ({ navigation }: any) => {
+  const tagService = useTagService();
+  const blogsService = useBlogService();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showTagInput, setShowTagInput] = useState(false);
   const [tagText, setTagText] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const [previewVisible, setPreviewVisible] = useState(false); // For showing the preview modal
-
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [tagIds, setTagIds] = useState<string[]>([]);
   const { control, handleSubmit, setValue, watch } = useForm();
+  const [suggestions, setSuggestions] = useState<IdAndName[]>([]);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<IdAndName[]>([]);
 
+  const handleAddTag = () => {
+    if (tagText.trim() && !tags.includes(tagText)) {
+      setTags((prevTags) => [...prevTags, tagText.trim()]); // Add the new tag
+      setTagText(''); // Clear the input field
+      setFilteredSuggestions([]); // Clear suggestions
+    }
+  };
+
+  const handleTagInput = (text: string) => {
+    setTagText(text);
+    const filtered = suggestions.filter((tag) => tag.name.toLowerCase().includes(text.toLowerCase()));
+    setFilteredSuggestions(filtered);
+  };
+
+  const handleSuggestionPress = (tag: IdAndName) => {
+    if (!tags.includes(tag.name)) {
+      console.log("Id : ", tag.id, " Name : ", tag.name);
+      setTagIds((prevTags) => [...prevTags, tag.id]);
+      setTags((prevTags) => [...prevTags, tag.name]);
+    }
+    setTagText(''); // Clear input field
+    setFilteredSuggestions([]); // Clear suggestions
+  };
   const options = {
     mediaType: 'photo',
     includeBase64: false,
     maxHeight: 2000,
     maxWidth: 2000,
   };
-
+  const authService = useAuthService();
   const handleImagePick = async () => {
     try {
       const resp = await launchImageLibrary(options);
       if (resp.assets && resp.assets.length > 0) {
+        console.log("Image : ", resp);
         const imageUri = resp.assets[0].uri;
-        setSelectedImage(imageUri);
+        const formData = new FormData();
+        var file = resp.assets[0];
+        // Append the file to the FormData object
+        formData.append('formFile', {
+            uri: file.uri,          // The file's URI
+            type: file.type,        // The file's MIME type (e.g., 'image/jpeg')
+            name: file.fileName,        // The file's name
+        });
+        const response = await authService.addImage(formData);
+        setSelectedImage(response.data);
         setValue('image', imageUri); // Set the image field in the form
       }
     } catch (error) {
@@ -33,29 +76,26 @@ const AddBlog = ({ navigation }: any) => {
     }
   };
 
-  const onSubmit = (data: any) => {
-    const formData = new FormData();
-    formData.append('blogContent', data.blogContent);
-    if (data.image) {
-      formData.append('image', {
-        uri: data.image,
-        type: 'image/jpeg', // Change based on the image type
-        name: 'uploaded_image.jpg',
-      });
+  const onSubmit = async(data: any) => {
+    const payload : BlogForm = {
+      description: data.blogContent, // Map to description
+      tags: tagIds, // Tags array
+      imageUrls: selectedImage != null ? [selectedImage] : [] // Array of image URLs
+    };
+    try {
+      console.log('Payload:', payload);
+      const response = await blogsService.addBlog(data);
+      console.log("Response : ", response);
+      // API call to submit the payload
+      Alert.alert('Blog post submitted!');
+      setPreviewVisible(false); // Close the modal after submission
+      setTags([]);
+      setTagIds([]);
+      
+    } catch (error) {
+      console.error(error)
     }
-    formData.append('tags', JSON.stringify(tags)); // Append tags array
-
-    // API call to submit the formData
-    console.log('Form Data:', formData);
-    Alert.alert('Blog post submitted!');
-    setPreviewVisible(false); // Close the modal after submission
-  };
-
-  const handleAddTag = () => {
-    if (tagText.trim()) {
-      setTags((prevTags) => [...prevTags, tagText.trim()]); // Add the tag to the array
-      setTagText(''); // Clear the input field
-    }
+    
   };
 
   const handlePreview = () => {
@@ -64,7 +104,17 @@ const AddBlog = ({ navigation }: any) => {
 
   // Get current blog content
   const blogContent = watch('blogContent', '');
-
+  useEffect(()=>{
+    ;(async()=>{
+      try {
+        const data : ApiResponse<IdAndName[]> = await tagService.getTags();
+        console.log("Tags : ", data);
+        setSuggestions(data.data);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  },[navigation])
   return (
     <View style={styles.container}>
       {/* Header Row */}
@@ -78,10 +128,10 @@ const AddBlog = ({ navigation }: any) => {
         />
         <View style={styles.avatarContainer}>
           <Image
-            source={{ uri: 'https://your-avatar-url.com' }}
+            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/6596/6596121.png' }}
             style={styles.avatar}
           />
-          <Text style={styles.nameText}>John Doe</Text>
+          <Text style={styles.nameText} >Prince Raghuwnashi</Text>
         </View>
         <TouchableOpacity style={styles.postButton} onPress={handlePreview}>
           <Text style={styles.postButtonText}>Preview</Text>
@@ -120,13 +170,32 @@ const AddBlog = ({ navigation }: any) => {
 
       {/* Tag Input Field */}
       {showTagInput && (
-        <View style={styles.tagInputContainer}>
-          <TextInput
-            style={styles.tagInput}
-            placeholder="Enter tag..."
-            value={tagText}
-            onChangeText={setTagText}
-          />
+        <View>
+          <View style={styles.tagInputContainer}>
+            <TextInput
+              style={styles.tagInput}
+              placeholder="Enter tag..."
+              value={tagText}
+              onChangeText={handleTagInput}
+            />
+              {/* <TouchableOpacity style={styles.addTagButton} onPress={handleAddTag}>
+                <Text style={styles.addTagText}>Add Tag</Text>
+              </TouchableOpacity> */}
+            
+              {/* Dropdown for filtered suggestions */}
+              {filteredSuggestions.length > 0 && (
+                <FlatList
+                  data={filteredSuggestions}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity onPress={() => handleSuggestionPress(item)} style={styles.suggestionItem}>
+                      <Text>{item.name}</Text>
+                    </TouchableOpacity>
+                  )}
+                  style={styles.suggestionList}
+                />
+              )}
+            </View>
           <TouchableOpacity style={styles.addTagButton} onPress={handleAddTag}>
             <Text style={styles.addTagText}>Add Tag</Text>
           </TouchableOpacity>
@@ -202,6 +271,51 @@ const AddBlog = ({ navigation }: any) => {
 export default AddBlog;
 
 const styles = StyleSheet.create({
+  
+  tagInputContainer: {
+    flexDirection: 'column',
+    marginTop: 10,
+  },
+  tagInput: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+  },
+  addTagButton: {
+    backgroundColor: '#2d545e',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  addTagText: {
+    color: '#fff',
+  },
+  suggestionList: {
+    maxHeight: 100, // Limit height for suggestions
+  },
+  suggestionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  tagsContainer: {
+    marginTop: 20,
+  },
+  tagsLabel: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  tagItem: {
+    backgroundColor: '#2d545e',
+    padding: 8,
+    borderRadius: 20,
+    marginRight: 5,
+  },
+  tagText: {
+    color: '#fff',
+  },
   container: {
     flex: 1,
     padding: 16,
@@ -267,43 +381,6 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     elevation: 2,
   },
-  tagInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  tagInput: {
-    flex: 1,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 10,
-  },
-  addTagButton: {
-    backgroundColor: '#2d545e',
-    padding: 10,
-    marginLeft: 10,
-    borderRadius: 8,
-  },
-  addTagText: {
-    color: '#fff',
-  },
-  tagsContainer: {
-    marginTop: 10,
-  },
-  tagsLabel: {
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  tagItem: {
-    backgroundColor: '#2d545e',
-    padding: 8,
-    borderRadius: 20,
-    marginRight: 5,
-  },
-  tagText: {
-    color: '#fff',
-  },
   modalContainer: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -346,4 +423,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
   },
+
 });

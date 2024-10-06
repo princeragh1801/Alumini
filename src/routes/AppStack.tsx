@@ -5,10 +5,14 @@ import Profile from '../screens/Profile';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Events from '../screens/Events';
 import Blogs from '../screens/Blogs';
-import { Avatar, Image } from 'react-native-elements';
+import { Image } from 'react-native-elements';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../store/userSlice';
 
 const Tab = createBottomTabNavigator();
 const AppStack = () => {
+  const user = useSelector(selectUser);
+  const imageUrl = user?.imageUrl;
   return (
     <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -38,7 +42,7 @@ const AppStack = () => {
           options={({ navigation }) => ({
             headerLeft : (props) => (
               <TouchableOpacity>
-                <Avatar/>
+                <Image source={{ uri: imageUrl }} style={styles.avatar} />
               </TouchableOpacity>
             ),
             headerRight : (props) => (
@@ -74,12 +78,34 @@ const AppStack = () => {
             }
           }} 
         /> */}
-        <Tab.Screen name="Events" component={Events} />
-        <Tab.Screen name="Profile" component={Profile} />
+        <Tab.Screen name="Events" component={Events} options={{
+            headerTitle: 'Events', 
+            headerTitleAlign: 'center',
+            headerTitleStyle : {
+              fontWeight : 'bold',
+              color : '#2d545e'
+            }
+          }}/>
+        <Tab.Screen name="Profile" component={Profile} options={{
+            headerTitle: 'Profile', 
+            headerTitleAlign: 'center',
+            headerTitleStyle : {
+              fontWeight : 'bold',
+              color : '#2d545e'
+            }
+          }} />
       </Tab.Navigator>
   )
 }
 
 export default AppStack
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  avatar: {
+    marginLeft : 10,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      marginRight: 10,
+    },
+})

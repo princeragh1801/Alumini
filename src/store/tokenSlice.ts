@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from './store';
 
 // Define the initial state type
 interface TokenState {
@@ -26,6 +27,6 @@ export const tokenSlice = createSlice({
 export const { setToken, clearToken } = tokenSlice.actions;
 
 // Add type annotation for the selector
-export const selectToken = (state: { token: TokenState }) => state.token.token;
+export const selectToken = (state: RootState) => state.tokens.token;
 
 export default tokenSlice.reducer;

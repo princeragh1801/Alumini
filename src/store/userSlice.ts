@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { UserBasic } from '../interfaces/user';
+import { RootState } from './store';
 
 // Define the initial state type
 interface UserState {
@@ -31,6 +32,8 @@ export const userSlice = createSlice({
 export const { setUser, clearUser } = userSlice.actions;
 
 // Add type annotation for the selector
-export const selectUser = (state: { user: UserState }) => state.user.userData;
+// In userSlice.ts
+export const selectUser = (state: RootState) => state.users.userData;
+
 
 export default userSlice.reducer;

@@ -1,18 +1,27 @@
 import { AxiosInstance } from "axios";
 import { LoginForm, SignUpForm } from "../interfaces/auth";
 import useAxios from "./axiosInstance";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 
 class AuthService{
     instance : AxiosInstance
-
     constructor(axiosInstance : AxiosInstance){
         this.instance = axiosInstance;
     }
+    async addImage(file : any){
+        try {
+            console.log("File : ", file)
+            const {data} = await this.instance.post('Image', file, {headers : {"Content-Type" : "multipart/form-data", 'accept' : 'text/plain'}})
+            console.log("Image upload response : ", data);
+            return data;
+        } catch (error) {
+            console.error(error)
+        }
+    }
     async getCurrentUser(){
         try {
-            const {data} = await this.instance.get(`User/CurrentUser`);
+            const {data} = await this.instance.get(`User/GetLoginUserInfo`);
             return data;
         } catch (error) {
             console.error(error);
@@ -85,10 +94,8 @@ class AuthService{
 
 const useAuthService = ()=>{
     const axiosInstance = useAxios();
-
   // useMemo to create the service instance only when axiosInstance changes
   const authService = useMemo(() => new AuthService(axiosInstance), [axiosInstance]);
-
   return authService;
 };
 export default useAuthService;

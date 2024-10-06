@@ -1,31 +1,22 @@
 import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectToken } from '../store/tokenSlice';
-import { useEffect, useState } from 'react';
-import { getToken } from '../utils/token';
 
 const useAxios = () => {
-  const [token, setToken] = useState("")
-
-  const instance = axios.create({
+  const instanceRef = useRef(axios.create({
     baseURL: 'http://alumnieconnect.runasp.net/api/',
     timeout: 30000,
-  });
+  }));
+  const token = useSelector(selectToken);
 
-  // Interceptor to add the token to headers
   useEffect(() => {
-    ;(async()=> {
-      try {
-        const response = await getToken();
-        if(response != null && response != undefined) setToken(response);
-      } catch (error) {
-        console.error();
-      }
-    })();
-    const requestInterceptor = instance.interceptors.request.use(
+    const requestInterceptor = instanceRef.current.interceptors.request.use(
       (config) => {
         if (token) {
-          config.headers['Authorization'] = `Bearer ${token}`;
+          config.headers['Authorization'] = `Bearer ${token}`; // Add token to headers
+        } else {
+          delete config.headers['Authorization']; // Remove it if there's no token
         }
         return config;
       },
@@ -34,13 +25,22 @@ const useAxios = () => {
       }
     );
 
-    return () => {
-      // Eject the interceptor when the component unmounts
-      instance.interceptors.request.eject(requestInterceptor);
-    };
-  }, [token]);
+    const responseInterceptor = instanceRef.current.interceptors.response.use(
+      (response) => response, // Simply return the response
+      (error) => {
+        console.error("API error:", error);
+        return Promise.reject(error);
+      }
+    );
 
-  return instance;
+    // Cleanup interceptors on unmount
+    return () => {
+      instanceRef.current.interceptors.request.eject(requestInterceptor);
+      instanceRef.current.interceptors.response.eject(responseInterceptor);
+    };
+  }, [token]); // Dependency on token
+
+  return instanceRef.current; // Return the Axios instance
 };
 
 export default useAxios;

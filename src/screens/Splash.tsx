@@ -2,8 +2,24 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch } from 'react-redux';
+import { getToken } from '../utils/token';
+import { setToken } from '../store/tokenSlice';
+
 const Splash = ({ navigation } : any) => {
+  const dispatch = useDispatch();
   useEffect(() => {
+    ;(async()=>{
+      try {
+        const token = await getToken();
+        if(token){
+          console.log("Token dispatching : ", token)
+          dispatch(setToken(token));
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    })();
     const timer = setTimeout(() => {
       // Navigate to the main application screen after 3 seconds
       navigation.replace('Router'); // Replace 'Main' with your main screen name

@@ -7,35 +7,36 @@ import { getToken } from '../utils/token';
 import Loading from '../screens/Loading';
 import useAuthService  from '../services/authService';
 import { useDispatch } from 'react-redux';
-import { setToken } from '../store/tokenSlice';
 import { setUser } from '../store/userSlice';
 import { UserBasic } from '../interfaces/user';
+import { ApiResponse } from '../interfaces/response';
 
 const Router = () => {
   const authService = useAuthService();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
     const dispatch = useDispatch();
+    const fetchCurrentUser = async() => {
+      try {
+        const data : ApiResponse<UserBasic> = await authService.getCurrentUser();
+            if(data != null){
+              const user = data.data;
+              if(user != null){
+                console.log("Current user : ", user);
+                dispatch(setUser(user));
+                setIsLoggedIn(true);
+              }
+            }
+            console.log("router data : ", data);
+      } catch (error) {
+        console.error(error);
+      }finally{
+        setLoading(false)
+      }
+    }
     useEffect(()=>{
-      ;(async () => {
-        try {
-          var token = await getToken();
-          console.log("Token : ", token);
-          if(token != null && token != ""){
-            setIsLoggedIn(true)
-            // const data : UserBasic = await authService.getCurrentUser();
-            dispatch(setToken(token));
-            // dispatch(setUser(data));
-            // console.log("User : ", data);
-            // setIsLoggedIn(true);
-            
-          }
-          setLoading(false)
-        } catch (error) {
-          console.error(error);
-        }
-      })();
-    })
+      fetchCurrentUser();
+    },[])
     if(loading) {
       return <Loading/>
     }
