@@ -10,9 +10,10 @@ import SecondaryButton from '../components/Button/SecondaryButton';
 import useAuthService from '../services/authService';
 import { useDispatch } from 'react-redux';
 import { storeToken } from '../utils/token';
+import { setToken } from '../store/tokenSlice';
 
 const Login : React.FC = ({navigation} : any) => {
-  //const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const authService = useAuthService();
   // refs
   const emailRef = useRef<TextInput>(null);
@@ -32,7 +33,10 @@ const Login : React.FC = ({navigation} : any) => {
       console.log("Response : ", response);
       if(response != null){
         await storeToken(response);
-        navigation.navigate('Home');
+        dispatch(setToken(response))
+        navigation.navigate('Root', {
+          screen : 'Home'
+        });
       }
     } catch (error) {
       console.error(error);

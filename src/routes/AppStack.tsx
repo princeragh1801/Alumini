@@ -6,13 +6,27 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Events from '../screens/Events';
 import Blogs from '../screens/Blogs';
 import { Image } from 'react-native-elements';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '../store/userSlice';
+import { clearToken } from '../store/tokenSlice';
+import { removeToken } from '../utils/token';
 
 const Tab = createBottomTabNavigator();
-const AppStack = () => {
+const AppStack = ({navigation} : any) => {
   const user = useSelector(selectUser);
   const imageUrl = user?.imageUrl;
+
+  const dispatch = useDispatch();
+  const logoutUser = async() => {
+    try {
+      await removeToken();
+      dispatch(clearToken())
+      navigation.navigate('Auth', {screen : 'Login'});
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -92,8 +106,18 @@ const AppStack = () => {
             headerTitleStyle : {
               fontWeight : 'bold',
               color : '#2d545e'
-            }
+            },
+            headerRight : (props) => (
+              <TouchableOpacity
+              style={{marginRight : 20}}
+                {...props}
+                onPress={() => logoutUser()}
+              >
+                <Ionicons name="chatbubbles" size={24} color="black" />
+              </TouchableOpacity>
+            ),
           }} />
+          {/* <Tab.Screen name='Auth' component={AuthStack} options={{headerShown : false}}/> */}
       </Tab.Navigator>
   )
 }

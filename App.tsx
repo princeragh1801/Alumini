@@ -10,12 +10,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Splash from './src/screens/Splash';
 import { Provider, useDispatch } from 'react-redux';
 import { store } from './src/store/store';
-import { getToken } from './src/utils/token';
-import { setToken } from './src/store/tokenSlice';
+import AuthStack from './src/routes/AuthStack';
 
 const Stack = createNativeStackNavigator();
 
-function App() {
+function App({navigation} : any) {
   
   return (
     <Provider store={store}>
@@ -24,7 +23,7 @@ function App() {
       <Stack.Navigator>
         <Stack.Screen name="Splash" component={Splash} options={{headerShown : false}} />
         <Stack.Screen name='Router' component={Router} options={{headerShown : false}} />
-          
+        <Stack.Screen name='Auth' component={AuthStack} options={{headerShown : false}}/>
         <Stack.Screen
         name="AddBlog"
         component={AddBlog}

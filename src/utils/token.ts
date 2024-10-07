@@ -16,8 +16,15 @@ const getToken = async() => {
         console.error("Error while extracting token", error);
     }
 }
-
+const removeToken = async() => {
+  try {
+    await AsyncStorage.clear();
+  } catch (error) {
+    console.error(error);
+  }
+}
 export {
     storeToken,
-    getToken
+    getToken,
+    removeToken
 }

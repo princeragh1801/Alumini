@@ -8,7 +8,8 @@ export interface LoginForm{
 
 export interface SignUpForm{
     name : string,
-    email : string,
+    gmail : string,
+    otp : string,
     password : string,
     collegeId : string,
     courseId : string,

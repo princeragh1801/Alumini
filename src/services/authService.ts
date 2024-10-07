@@ -73,7 +73,7 @@ class AuthService{
 
     async getCollegeCourse(collegeId : string){
         try {
-            const {data} = await this.instance.get(`College/GetCourse${collegeId}`);
+            const {data} = await this.instance.get(`College/GetCourse/${collegeId}`);
             return data;
         } catch (error) {
             console.error(error);
@@ -88,7 +88,7 @@ class AuthService{
             console.error(error);
         }
     }
-
+    
  
 }
 
