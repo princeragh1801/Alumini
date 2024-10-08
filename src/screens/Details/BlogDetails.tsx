@@ -5,52 +5,65 @@ import RenderHTML from 'react-native-render-html';
 import { formatTime } from '../../utils/timeFormat';
 import { Blog } from '../../interfaces/blog';
 import { Comment } from '../../interfaces/shared';
-import { Button } from 'react-native-elements';
 import { ApiResponse } from '../../interfaces/response';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../store/userSlice';
+import { Role } from '../../interfaces/enums';
 
 type BlogDetailsProps = {
-  route : any
+  route: any;
 };
 
 const BlogDetails = ({ route }: BlogDetailsProps) => {
-
+  const loginUser = useSelector(selectUser);
   const blogsService = useBlogService();
   const { blogId } = route.params;
   const [blogData, setBlogData] = useState<Blog>();
   const [loading, setLoading] = useState(true);
-  const [commentsVisible, setCommentsVisible] = useState(false);
+  const [commentsVisible, setCommentsVisible] = useState(true);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<Comment[]>([]); // assuming you will fetch comments from API
 
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      // const newCommentObject = {
-      //   comment: newComment,
-      //   commentId: new Date().getTime().toString(), // Temporary id, replace with real API-generated ID
-      //   user: {
-      //     id: "3fa85f64-5717-4562-b3fc-2c963f66afa6", // Replace with logged-in user's ID
-      //     name: "John Doe", // Replace with logged-in user's name
-      //     imageUrl: "https://example.com/user-profile.png" // Replace with user's profile image
-      //   }
-      // };
-      // setComments([newCommentObject, ...comments]);
-      // setNewComment('');
+  const handleAddComment = async() => {
+    try {
+      if (newComment.trim()) {
+        // Logic to post new comment goes here
+        // Reset input field after adding a comment
+        var response : ApiResponse<string> = await blogsService.addBlogComment(blogId, newComment);
+        if(response.success){
+          var cmntObj : Comment = {
+            comment : newComment,
+            commentId : response.data,
+            user : loginUser,
+          }
+          setComments(prevCmnt => [...prevCmnt, cmntObj]);
+          setNewComment('');
+        }
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
   useEffect(() => {
     (async () => {
       try {
-        console.log("Date : ", Date());
         const data = await blogsService.getBlogById(blogId);
         setBlogData(data);
-        console.log("Blog details : ", data);
-        setLoading(false)
+        setLoading(false);
       } catch (error) {
         console.error("Failed to fetch blogs:", error);
       }
     })();
-    
+
+    (async () => {
+      try {
+        const data: ApiResponse<Comment[]> = await blogsService.getBlogComment(blogId);
+        setComments(data.data);
+      } catch (error) {
+        console.error("Failed to fetch comments:", error);
+      }
+    })();
   }, [blogId]);
 
   if (loading) {
@@ -70,107 +83,103 @@ const BlogDetails = ({ route }: BlogDetailsProps) => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.profileContainer}>
-        {/* User Profile Information */}
-        {blogData.user.imageUrl && <Image source={{ uri: blogData.user.imageUrl }} style={styles.avatar} />}
-        <View style={styles.nameContainer}>
-          <Text style={styles.name}>{blogData.user.name || 'Unknown User'}</Text>
-          <Text style={styles.headline}>{blogData.user.headLine || 'No Headline'}</Text>
-          <Text style={styles.createdOn}>{formatTime(blogData.createdOn)}</Text>
-        </View>
-      </View>
-
-      {/* Blog Image */}
-      {blogData.mediaUrls && blogData.mediaUrls.length > 0 && (
-        <Image source={{ uri: blogData.mediaUrls[0] }} style={styles.image} />
-      )}
-
-      {/* Blog Description */}
-      <View style={styles.descriptionContainer}>
-        <RenderHTML contentWidth={300} source={{ html: blogData.description }} />
-      </View>
-
-      {/* Tags */}
-      {blogData.tags && blogData.tags.length > 0 && (
-        <View style={styles.tagsContainer}>
-          <FlatList
-            data={blogData.tags}
-            horizontal
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.tagItem}>
-                <Text style={styles.tagText}>#{item.name}</Text>
-              </View>
-            )}
-          />
-        </View>
-      )}
-
-      {/* Show Comments Button */}
-      <View style={styles.showComment}>
-      <TouchableOpacity
-      style = {styles.addCommentButton}
-        onPress={() => setCommentsVisible(!commentsVisible)}
-      ><Text>{commentsVisible ? "Hide Comments" : "Show Comments"}</Text></TouchableOpacity>
-
-      </View>
-      {/* Comments Section */}
-      {commentsVisible && (
-        <>
-          {/* Add Comment Input */}
-          <View style={styles.addCommentContainer}>
-            <TextInput
-              style={styles.commentInput}
-              value={newComment}
-              onChangeText={setNewComment}
-              placeholder="Add a comment..."
-            />
-            <TouchableOpacity style={styles.addCommentButton} onPress={handleAddComment}>
-              <Text style={styles.addCommentButtonText}>Post</Text>
-            </TouchableOpacity>
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.profileContainer}>
+          {/* User Profile Information */}
+          {blogData.user.imageUrl && <Image source={{ uri: blogData.user.imageUrl }} style={styles.avatar} />}
+          <View style={styles.nameContainer}>
+            <Text style={styles.name}>{blogData.user.name || 'Unknown User'}</Text>
+            <Text style={styles.headline}>{blogData.user.headLine || 'No Headline'}</Text>
+            <Text style={styles.createdOn}>{formatTime(blogData.createdOn)}</Text>
           </View>
+        </View>
 
-          {/* Comments List */}
-          {comments.length > 0 ? (
+        {/* Blog Image */}
+        {blogData.mediaUrls && blogData.mediaUrls.length > 0 && (
+          <Image source={{ uri: blogData.mediaUrls[0] }} style={styles.image} />
+        )}
+
+        {/* Blog Description */}
+        <View style={styles.descriptionContainer}>
+          <RenderHTML contentWidth={300} source={{ html: blogData.description }} />
+        </View>
+
+        {/* Tags */}
+        {blogData.tags && blogData.tags.length > 0 && (
+          <View style={styles.tagsContainer}>
             <FlatList
-              data={comments}
-              keyExtractor={(item) => item.commentId}
+              data={blogData.tags}
+              horizontal
+              keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <View style={styles.commentItem}>
-                  <View style={styles.commentUser}>
-                    {item.user.imageUrl && (
-                      <Image source={{ uri: item.user.imageUrl }} style={styles.commentAvatar} />
-                    )}
-                    <View style={styles.commentUserInfo}>
-                      <Text style={styles.commentAuthor}>{item.user.name || 'Unknown User'}</Text>
-                    </View>
-                  </View>
-                  <Text style={styles.commentText}>{item.comment}</Text>
-                  {/* <Text style={styles.commentDate}>{formatTime()}</Text> */}
+                <View style={styles.tagItem}>
+                  <Text style={styles.tagText}>#{item.name}</Text>
                 </View>
               )}
             />
-          ) : (
-            <Text style={styles.noCommentsText}>No comments yet.</Text>
-          )}
-        </>
-      )}
-    </ScrollView>
+          </View>
+        )}
+        <Text style={styles.commentHeading} >Comments</Text>
+        {/* Comments Section */}
+        {commentsVisible && (
+          <>
+            {/* Comments List */}
+            {comments.length > 0 ? (
+              <FlatList
+                data={comments}
+                keyExtractor={(item) => item.commentId}
+                renderItem={({ item }) => (
+                  <View style={styles.commentItem}>
+                    <View style={styles.commentUser}>
+                      {item.user.imageUrl && (
+                        <Image source={{ uri: item.user.imageUrl }} style={styles.commentAvatar} />
+                      )}
+                      <View style={styles.commentUserInfo}>
+                        <Text style={styles.commentAuthor}>{item.user.name || 'Unknown User'}</Text>
+                      </View>
+                    </View>
+                    <Text style={styles.commentText}>{item.comment}</Text>
+                  </View>
+                )}
+              />
+            ) : (
+              <Text style={styles.noCommentsText}>No comments yet.</Text>
+            )}
+          </>
+        )}
+      </ScrollView>
+
+      {/* Fixed Comment Input */}
+      <View style={styles.addCommentContainer}>
+        <TextInput
+          style={styles.commentInput}
+          value={newComment}
+          onChangeText={setNewComment}
+          placeholder="Add a comment..."
+        />
+        <TouchableOpacity style={styles.addCommentButton} onPress={handleAddComment}>
+          <Text style={styles.addCommentButtonText}>Post</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  showComment : {
-    padding : 10,
-    backgroundColor : '#2d545e',
-    marginBottom : 20,
-    flex : 1,
+  commentHeading : {
+    marginVertical : 10,
+    color : '#2d545e',
+    fontWeight : 'bold',
+    fontSize : 20,
   },
   container: {
     flex: 1,
     padding: 16,
     backgroundColor: '#fff',
+  },
+  scrollView: {
+    flex: 1,
   },
   loaderContainer: {
     flex: 1,
@@ -198,6 +207,7 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 14,
     color: '#666',
+    marginRight : 10,
   },
   createdOn: {
     fontSize: 12,
@@ -231,7 +241,10 @@ const styles = StyleSheet.create({
   addCommentContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 16,
+    padding: 4,
+    //borderTopWidth: 1,
+    borderTopColor: '#ccc',
+    backgroundColor: '#fff',
   },
   commentInput: {
     flex: 1,
@@ -275,10 +288,6 @@ const styles = StyleSheet.create({
   },
   commentText: {
     marginTop: 4,
-  },
-  commentDate: {
-    fontSize: 12,
-    color: '#666',
   },
   noCommentsText: {
     textAlign: 'center',

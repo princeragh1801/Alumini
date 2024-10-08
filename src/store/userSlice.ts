@@ -1,16 +1,24 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { UserBasic } from '../interfaces/user';
 import { RootState } from './store';
+import { Role } from '../interfaces/enums';
 
+var defaultUser : UserBasic = {
+  name : "Prince Raghuwanshi",
+  id : '46149ee7-1623-479c-b867-08dce38e0606',
+  imageUrl : "https://cdn-icons-png.flaticon.com/512/6596/6596121.png",
+  role : Role.Student,
+  headLine : "Intern-PageUp | Knight @leetcode | 3 ⭐ @codechef | Solve 500+ Problem on GFG || MERN Stack Developer"
+}
 // Define the initial state type
 interface UserState {
-  userData: UserBasic | null;
+  userData: UserBasic;
   status: boolean;
 }
 
 // Define the initial state
 const initialState: UserState = {
-  userData: null,
+  userData: defaultUser,
   status: false,
 };
 
@@ -23,7 +31,7 @@ export const userSlice = createSlice({
       state.status = true;
     },
     clearUser: (state) => {
-      state.userData = null;
+      state.userData = defaultUser;
       state.status = false;
     },
   },

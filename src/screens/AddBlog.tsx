@@ -111,7 +111,6 @@ const AddBlog = ({navigation}: any) => {
       MediaFiles: selectedImage != null ? [selectedImage] : [],
     };
     try {
-      showInfo("hello")
       console.log('Payload : ', payload);
       const response : ApiResponse<string> = await blogsService.addBlog(payload);
       console.log('Response : ', response);

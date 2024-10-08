@@ -79,7 +79,15 @@ class BlogsService{
 
     async addBlogComment(blogId : string, comment : string){
         try {
-            const {data} = await this.instance.post(`BlogComment/blogId/${blogId}`, comment);
+            var obj = {
+                comment
+            }
+            
+            console.log(obj);
+            console.log("Blog id : ", blogId)
+            console.log("Comment : ", comment);
+            const {data} = await this.instance.post(`BlogComment/blogId/${blogId}`, obj);
+            console.log("Comment response : ", data);
             return data;
         } catch (error) {
             console.error(error);
