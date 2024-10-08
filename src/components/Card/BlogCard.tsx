@@ -42,7 +42,7 @@ const BlogCard = ({blog, navigation } : props) => {
           </Text>
 
         {/* Display the blog image */}
-        {blog.imageUrls != null && blog.imageUrls.length > 0 && <Image source={{ uri: blog.imageUrls[0] }} style={styles.image} />}
+        {blog.mediaUrls != null && blog.mediaUrls.length > 0 && <Image source={{ uri: blog.mediaUrls[0] }} style={styles.image} />}
         </TouchableOpacity>
 
 

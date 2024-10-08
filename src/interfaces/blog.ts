@@ -5,7 +5,7 @@ export interface Blog {
   id: string;
   description: string;
   tags: IdAndName[];
-  imageUrls: string[];
+  mediaUrls: string[];
   user: UserBasic;
   createdOn: string;
   updatedOn: string | null;
@@ -14,5 +14,11 @@ export interface Blog {
 export interface BlogForm {
   description : string,
   imageUrls : string[],
+  tags : string[]
+}
+
+export interface BlogPost {
+  description : string,
+  MediaFiles : any[],
   tags : string[]
 }

@@ -1,4 +1,5 @@
 import { Role } from "./enums";
+import { UserBasic } from "./user";
 
 export interface LoginForm{
     email : string,
@@ -16,4 +17,9 @@ export interface SignUpForm{
     branchId : string,
     admissionYear : number,
     passoutYear : number
+}
+
+export interface LoginResponse{
+    token : string,
+    user : UserBasic
 }

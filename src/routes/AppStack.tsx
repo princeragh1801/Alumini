@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '../store/userSlice';
 import { clearToken } from '../store/tokenSlice';
 import { removeToken } from '../utils/token';
-
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 const Tab = createBottomTabNavigator();
 const AppStack = ({navigation} : any) => {
   const user = useSelector(selectUser);
@@ -113,7 +113,7 @@ const AppStack = ({navigation} : any) => {
                 {...props}
                 onPress={() => logoutUser()}
               >
-                <Ionicons name="chatbubbles" size={24} color="black" />
+                <MaterialIcon name="logout" size={24} color="black" />
               </TouchableOpacity>
             ),
           }} />

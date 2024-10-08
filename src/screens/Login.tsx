@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useRef } from 'react'
 import { useForm } from 'react-hook-form'
-import { LoginForm } from '../interfaces/auth'
+import { LoginForm, LoginResponse } from '../interfaces/auth'
 import { Role } from '../interfaces/enums';
 import InputText from '../components/Input/InputText';
 import EnumInput from '../components/Input/EnumInput';
@@ -11,6 +11,8 @@ import useAuthService from '../services/authService';
 import { useDispatch } from 'react-redux';
 import { storeToken } from '../utils/token';
 import { setToken } from '../store/tokenSlice';
+import { ApiResponse } from '../interfaces/response';
+import { setUser } from '../store/userSlice';
 
 const Login : React.FC = ({navigation} : any) => {
   const dispatch = useDispatch();
@@ -29,11 +31,12 @@ const Login : React.FC = ({navigation} : any) => {
   const onSubmit = async(data: LoginForm) => {
     try {
       console.log("Data : ", data)
-      const response = await authService.loginUser(data);
+      const response : ApiResponse<LoginResponse> = await authService.loginUser(data);
       console.log("Response : ", response);
       if(response != null){
-        await storeToken(response);
-        dispatch(setToken(response))
+        await storeToken(response.data.token);
+        dispatch(setToken(response.data.token));
+        dispatch(setUser(response.data.user));
         navigation.navigate('Root', {
           screen : 'Home'
         });
