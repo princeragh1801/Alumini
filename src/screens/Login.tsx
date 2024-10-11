@@ -48,7 +48,7 @@ const Login : React.FC = ({navigation} : any) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Login As Student</Text>
 
       <InputText
         ref={emailRef}
@@ -80,7 +80,7 @@ const Login : React.FC = ({navigation} : any) => {
         }}
         errorMessage={errors.password?.message}
       />
-      <View>
+      {/* <View>
         <Text style={{marginBottom:5}}>Select Your Role</Text>
         <EnumInput
           control={control}
@@ -90,7 +90,7 @@ const Login : React.FC = ({navigation} : any) => {
             required : 'Role is required'
           }}
         />
-      </View>
+      </View> */}
       <PrimaryButton name='Login' onPress={handleSubmit(onSubmit)} />
         <Text style={styles.orText} >OR</Text>
       <SecondaryButton name='Create Account' onPress={()=> navigation.navigate('SignUp')}/>

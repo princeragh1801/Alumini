@@ -8,7 +8,6 @@ import { Comment } from '../../interfaces/shared';
 import { ApiResponse } from '../../interfaces/response';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../store/userSlice';
-import { Role } from '../../interfaces/enums';
 
 type BlogDetailsProps = {
   route: any;

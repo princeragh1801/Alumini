@@ -27,6 +27,17 @@ class AuthService{
             console.error(error);
         }
     }
+
+    async getUserById(id : string){
+        try {
+            const {data} = await this.instance.get(`User/GetStudentDetails/${id}`);
+            return data;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+
     async loginUser(formData : LoginForm){
         try {
             const {data} = await this.instance.post("Authorization", formData);
@@ -73,7 +84,7 @@ class AuthService{
 
     async getCollegeCourse(collegeId : string){
         try {
-            const {data} = await this.instance.get(`College/GetCourse/${collegeId}`);
+            const {data} = await this.instance.get(`College/GetCollegeCourse/${collegeId}`);
             return data;
         } catch (error) {
             console.error(error);
@@ -82,7 +93,9 @@ class AuthService{
 
     async getCollegeBranchUnderCourse(courseId : string){
         try {
+            console.log("Course Id : ", courseId);
             const {data} = await this.instance.get(`College/GetBranchesUnderCollegeCourse/${courseId}`);
+            console.log("Branches ", data);
             return data;
         } catch (error) {
             console.error(error);

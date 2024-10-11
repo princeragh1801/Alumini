@@ -12,7 +12,6 @@ import {Controller, useForm} from 'react-hook-form';
 import {SignUpForm} from '../interfaces/auth';
 import InputText from '../components/Input/InputText';
 import {IdAndName} from '../interfaces/shared';
-import DropDownInput from '../components/Input/DropDownInput';
 import PrimaryButton from '../components/Button/PrimaryButton';
 import SecondaryButton from '../components/Button/SecondaryButton';
 import useAuthService from '../services/authService';
@@ -22,6 +21,7 @@ import {storeToken} from '../utils/token';
 import {useDispatch} from 'react-redux';
 import {setToken} from '../store/tokenSlice';
 import {Picker} from '@react-native-picker/picker';
+import { Course } from '../interfaces/college';
 
 const SignUp: React.FC = ({navigation}: any) => {
   const authService = useAuthService();
@@ -42,12 +42,13 @@ const SignUp: React.FC = ({navigation}: any) => {
   } = useForm<SignUpForm>();
 
   // states
-  const [courses, setCourses] = useState<IdAndName[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [branches, setBranches] = useState<IdAndName[]>([]);
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [buttonText, setButtonText] = useState('Send OTP');
   const [collegeId, setCollegeId] = useState('');
+  const [course, setCourse] = useState<Course>();
   const [otp, setOtp] = useState('');
   const onSubmit = async (data: SignUpForm) => {
     try {
@@ -110,8 +111,10 @@ const SignUp: React.FC = ({navigation}: any) => {
   };
   const fetchCourse = async () => {
     try {
-      const response: ApiResponse<IdAndName[]> =
+      console.log("College Id : ", collegeId)
+      const response: ApiResponse<Course[]> =
         await authService.getCollegeCourse(collegeId);
+        console.log("Response : ", response);
       if (response.data) {
         setCourses(response.data);
       }
@@ -134,8 +137,11 @@ const SignUp: React.FC = ({navigation}: any) => {
   const submitForm = async (data: SignUpForm) => {
     try {
       data.collegeId = collegeId;
+      data.courseId = course?.courseId??'';
       //data.courseId = courseId;
+      console.log("Data : ", data);
       const response = await authService.registerUser(data);
+      console.log("Response : ", response);
       if (response) {
         await storeToken(response);
         dispatch(setToken(response));
@@ -151,7 +157,7 @@ const SignUp: React.FC = ({navigation}: any) => {
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create an account</Text>
+      <Text style={styles.title}>Register As Student</Text>
       {!otpVerified && (
         <InputText
           ref={nameRef}
@@ -213,7 +219,15 @@ const SignUp: React.FC = ({navigation}: any) => {
               <Picker
                 selectedValue={value}
                 style={styles.picker}
-                onValueChange={onChange}>
+                onValueChange={(itemValue) => {
+                  const selectedCourse = courses.find(course => course.id === itemValue);
+                  setCourse(selectedCourse)
+                  onChange({
+                    courseId: itemValue,      // The selected branch ID
+                    course: selectedCourse    // The entire branch object
+                  });
+                  fetchBranch(selectedCourse?.id??"")
+                }}>
                 <Picker.Item
                   key={`Select your Course`}
                   label={`Select your Course`}
@@ -243,7 +257,7 @@ const SignUp: React.FC = ({navigation}: any) => {
               <Picker
                 selectedValue={value}
                 style={styles.picker}
-                onValueChange={onChange}>
+                onValueChange={(onChange)}>
                 <Picker.Item
                   key={`Select your Branch`}
                   label={`Select your Branch`}
