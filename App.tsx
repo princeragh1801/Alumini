@@ -15,6 +15,7 @@ import Profile from './src/screens/Profile';
 import { TouchableOpacity } from 'react-native';
 import { removeToken } from './src/utils/token';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
+import AddEvent from './src/screens/AddEvent';
 
 const Stack = createNativeStackNavigator();
 
@@ -59,6 +60,11 @@ function App({navigation} : any) {
         <Stack.Screen
         name="AddBlog"
         component={AddBlog}
+        options={{headerShown : false}}
+      />
+      <Stack.Screen
+        name="AddEvent"
+        component={AddEvent}
         options={{headerShown : false}}
       />
         <Stack.Screen name='BlogDetails' component={BlogDetails} options={{headerBackButtonMenuEnabled:true}} />

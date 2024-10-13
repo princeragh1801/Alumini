@@ -16,3 +16,16 @@ export interface Event {
   updatedOn: string | null;
   updatedBy: string | null;
 }
+
+export interface EventAdd{
+  name: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;  
+  startTime: Date;
+  endTime: Date;   
+  mediaFiles : any[]; 
+  location: string;
+  registration_Deadline: Date; 
+  registration_Deadline_Time: Date; 
+}

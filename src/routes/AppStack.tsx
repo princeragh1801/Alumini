@@ -80,32 +80,27 @@ const AppStack = ({navigation} : any) => {
             }
           }} 
         /> */}
-        <Tab.Screen name="Events" component={Events} options={{
-            headerTitle: 'Events', 
-            headerTitleAlign: 'center',
-            headerTitleStyle : {
-              fontWeight : 'bold',
-              color : '#2d545e'
-            }
-          }}/>
-        {/* <Tab.Screen name="Profile" component={Profile} options={{
-            headerTitle: 'Profile', 
-            headerTitleAlign: 'center',
-            headerTitleStyle : {
-              fontWeight : 'bold',
-              color : '#2d545e'
-            },
+        <Tab.Screen name="Events" component={Events} options={({ navigation }) => ({
+            
             headerRight : (props) => (
               <TouchableOpacity
               style={{marginRight : 20}}
                 {...props}
-                onPress={() => logoutUser()}
+                onPress={() => {
+                  // Navigate to the Add Blog screen
+                  navigation.navigate('AddEvent');
+                }}
               >
-                <MaterialIcon name="logout" size={24} color="black" />
+                <Ionicons name="add" size={24} color="black" />
               </TouchableOpacity>
             ),
-          }} /> */}
-          {/* <Tab.Screen name='Auth' component={AuthStack} options={{headerShown : false}}/> */}
+            headerTitle:'Events',
+            headerTitleStyle : {
+              fontWeight : 'bold',
+              color : '#2d545e',
+            },
+            headerTitleAlign : 'center'
+          })}/>
       </Tab.Navigator>
   )
 }
