@@ -136,7 +136,6 @@ const AddEvent = ({navigation}: any) => {
   const handlePreview = () => {
     setPreviewVisible(true); // Open the modal for preview
   };
-
   return (
     <KeyboardAvoidingView
       style={{flex: 1}}
@@ -428,8 +427,7 @@ const AddEvent = ({navigation}: any) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <ScrollView>
-                <Text style={styles.previewTitle}>Blog Preview</Text>
-                <Text style={styles.previewContent}>Hello</Text>
+                <Text style={styles.previewTitle}>Event Preview</Text>
                 {selectedImage && (
                   <Image
                     source={{uri: selectedImage.uri}}
@@ -449,7 +447,7 @@ const AddEvent = ({navigation}: any) => {
                   style={styles.closePreviewButton}
                   onPress={handleSubmit(onSubmit)}
                   >
-                  <Text style={styles.closePreviewButtonText}>Post Blog</Text>
+                  <Text style={styles.closePreviewButtonText}>Post Event</Text>
                 </TouchableOpacity>
               </ScrollView>
             </View>

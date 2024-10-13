@@ -12,25 +12,12 @@ import { Provider } from 'react-redux';
 import { store } from './src/store/store';
 import AuthStack from './src/routes/AuthStack';
 import Profile from './src/screens/Profile';
-import { TouchableOpacity } from 'react-native';
-import { removeToken } from './src/utils/token';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import AddEvent from './src/screens/AddEvent';
 
 const Stack = createNativeStackNavigator();
 
 function App({navigation} : any) {
-  //const dispatch = useDispatch();
-
-  const logoutUser = async() => {
-    try {
-      await removeToken();
-      //dispatch(clearToken())
-      navigation.navigate('Auth', {screen : 'Login'});
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  
 
   return (
     <Provider store={store}>
@@ -40,23 +27,12 @@ function App({navigation} : any) {
         <Stack.Screen name="Splash" component={Splash} options={{headerShown : false}} />
         <Stack.Screen name='Router' component={Router} options={{headerShown : false}} />
         <Stack.Screen name='Auth' component={AuthStack} options={{headerShown : false}}/>                   
-        <Stack.Screen name="Profile" component={Profile} options={{
-            headerTitle: 'Profile', 
-            headerTitleAlign: 'center',
+        <Stack.Screen name="Profile" component={Profile} options={{ 
             headerTitleStyle : {
               fontWeight : 'bold',
-              color : '#2d545e'
+              color : '#2d545e',
             },
-            headerRight : (props) => (
-              <TouchableOpacity
-              style={{marginRight : 20}}
-                {...props}
-                onPress={() => logoutUser()}
-              >
-                <MaterialIcon name="logout" size={24} color="black" />
-              </TouchableOpacity>
-            ),
-          }}/>                   
+            headerTitleAlign : 'center'}} />                   
         <Stack.Screen
         name="AddBlog"
         component={AddBlog}

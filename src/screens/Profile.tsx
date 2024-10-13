@@ -1,7 +1,7 @@
 // ProfileScreen.tsx
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import useAuthService from '../services/authService';
 import { UserInfo } from '../interfaces/user';
 import { ApiResponse } from '../interfaces/response';
@@ -9,12 +9,18 @@ import Loading from './Loading';
 import NoContent from './NoContent';
 import { Role } from '../interfaces/enums';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser } from '../store/userSlice';
+import { removeToken } from '../utils/token';
+import { clearToken } from '../store/tokenSlice';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 
 type ProfileProps = {
   route: any;
 };
 
-const Profile = ({ route }: ProfileProps) => {
+const Profile = ({ route }: ProfileProps, nav : any) => {
+  const loggedInUser = useSelector(selectUser);
   const userService = useAuthService();
   const { id, role } = route.params;
   const navigation = useNavigation();
@@ -22,6 +28,17 @@ const Profile = ({ route }: ProfileProps) => {
   const [user, setUser] = useState<UserInfo>();
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("Profile");
+  const dispatch = useDispatch();
+
+  const logoutUser = async() => {
+    try {
+      await removeToken();
+      dispatch(clearToken())
+      nav.navigate('Auth', {screen : 'Login'});
+    } catch (error) {
+      console.error(error)
+    }
+  }
   useEffect(() => {
     (async () => {
       try {
@@ -43,6 +60,20 @@ const Profile = ({ route }: ProfileProps) => {
             navigation.setOptions({
               headerTitle : title
             })
+
+            if(data.data.id == loggedInUser.id){
+              navigation.setOptions({
+                headerRight : (props : any) => (
+                  <TouchableOpacity
+                  style={{marginRight : 20}}
+                    {...props}
+                    onPress={() => logoutUser()}
+                  >
+                    <MaterialIcon name="logout" size={24} color="black" />
+                  </TouchableOpacity>
+                )
+              })
+            }
           }
       } catch (error) {
         console.error(error);
