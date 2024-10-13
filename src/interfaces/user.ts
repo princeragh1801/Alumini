@@ -34,3 +34,30 @@ export interface UserBasic{
   imageUrl : string,
   headLine : string,
 }
+
+export interface UserInfo {
+  id: string;
+  name: string;
+  gmail: string;
+  password: string;
+  secondaryMail: string;
+  address: string;
+  bio: string;
+  contactNumber: string;
+  isActive: boolean;
+  collegeId: string;
+  college: string;
+  courseId: string;
+  course: string;
+  branchId: string;
+  branch: string;
+  countryId: string;
+  country: string;
+  stateId: string;
+  state: string;
+  cityId: string;
+  city: string;
+  profilePictureUrl: string;
+  admissionYear: number;
+  passoutYear: number;
+}

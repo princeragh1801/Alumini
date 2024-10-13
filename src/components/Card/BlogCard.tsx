@@ -22,7 +22,7 @@ const BlogCard = ({blog, navigation } : props) => {
       <View style={styles.card}>
         {/* Display user avatar and name */}
         <View style={styles.profileContainer}>
-          <TouchableOpacity style={styles.profileContainer} onPress={()=> navigation.navigate('Profile')}>
+          <TouchableOpacity style={styles.profileContainer} onPress={()=> navigation.navigate('Profile', {id : blog.user.id, role : blog.user.role})}>
           <Image source={{ uri:  blog.user.imageUrl}} style={styles.avatar} />
           <View style={styles.nameContainer}>
             <Text style={styles.name}>{blog.user.name}</Text>

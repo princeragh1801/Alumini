@@ -1,31 +1,16 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Profile from '../screens/Profile';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Events from '../screens/Events';
 import Blogs from '../screens/Blogs';
 import { Image } from 'react-native-elements';
-import { useDispatch, useSelector } from 'react-redux';
+import {useSelector } from 'react-redux';
 import { selectUser } from '../store/userSlice';
-import { clearToken } from '../store/tokenSlice';
-import { removeToken } from '../utils/token';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 const Tab = createBottomTabNavigator();
 const AppStack = ({navigation} : any) => {
   const user = useSelector(selectUser);
   const imageUrl = user?.imageUrl;
-
-  const dispatch = useDispatch();
-  const logoutUser = async() => {
-    try {
-      await removeToken();
-      dispatch(clearToken())
-      navigation.navigate('Auth', {screen : 'Login'});
-    } catch (error) {
-      console.error(error)
-    }
-  }
 
   return (
     <Tab.Navigator
@@ -55,7 +40,10 @@ const AppStack = ({navigation} : any) => {
           component={Blogs} 
           options={({ navigation }) => ({
             headerLeft : (props) => (
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => {
+                // Navigate to the Add Blog screen
+                navigation.navigate('Profile', {id : user.id, role : user.role});
+              }} >
                 <Image source={{ uri: imageUrl }} style={styles.avatar} />
               </TouchableOpacity>
             ),
@@ -100,7 +88,7 @@ const AppStack = ({navigation} : any) => {
               color : '#2d545e'
             }
           }}/>
-        <Tab.Screen name="Profile" component={Profile} options={{
+        {/* <Tab.Screen name="Profile" component={Profile} options={{
             headerTitle: 'Profile', 
             headerTitleAlign: 'center',
             headerTitleStyle : {
@@ -116,7 +104,7 @@ const AppStack = ({navigation} : any) => {
                 <MaterialIcon name="logout" size={24} color="black" />
               </TouchableOpacity>
             ),
-          }} />
+          }} /> */}
           {/* <Tab.Screen name='Auth' component={AuthStack} options={{headerShown : false}}/> */}
       </Tab.Navigator>
   )

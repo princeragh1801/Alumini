@@ -1,47 +1,107 @@
 // ProfileScreen.tsx
 
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import useAuthService from '../services/authService';
+import { UserInfo } from '../interfaces/user';
+import { ApiResponse } from '../interfaces/response';
+import Loading from './Loading';
+import NoContent from './NoContent';
+import { Role } from '../interfaces/enums';
+import { useNavigation } from '@react-navigation/native';
 
-const userProfile = {
-  id: "46149ee7-1623-479c-b867-08dce38e0606",
-  name: "Prince Raghuwanshi",
-  gmail: "princeraghuwanshi_cse21@ggct.co.in",
-  college: "Gyan Ganga College of Technology",
-  course: "B.Tech (Bachelor of Technology)",
-  branch: "CSE (Computer Science and Engineering)",
-  country: "India",
-  admissionYear: 2021,
-  passoutYear: 2025,
-  profilePictureUrl: "https://cdn-icons-png.flaticon.com/512/6596/6596121.png",
+type ProfileProps = {
+  route: any;
 };
 
-const Profile = () => {
+const Profile = ({ route }: ProfileProps) => {
+  const userService = useAuthService();
+  const { id, role } = route.params;
+  const navigation = useNavigation();
+  
+  const [user, setUser] = useState<UserInfo>();
+  const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState("Profile");
+  useEffect(() => {
+    (async () => {
+      try {
+        console.log("Inside useEffect");
+        console.log("Role : ", role)
+        var data : ApiResponse<UserInfo>;
+        if(role == Role.Student){
+          data = await userService.getUserById(id);
+          
+        }else{
+          console.log("Faculty")
+          data = await userService.getFacultyById(id);
+        }
+        
+        console.log("Data: ", data);
+          if (data.success) {
+            setUser(data.data);
+            setTitle(data.data.name);
+            navigation.setOptions({
+              headerTitle : title
+            })
+          }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+    
+  }, [id, title]);
+
+  if (loading) {
+    return <Loading />;
+  } else if (!user) {
+    return <NoContent />;
+  }
+  
   return (
-    <View style={styles.container}>
-      <Image source={{ uri: userProfile.profilePictureUrl }} style={styles.profilePicture} />
-      <Text style={styles.name}>{userProfile.name}</Text>
-      <Text style={styles.email}>{userProfile.gmail}</Text>
+    <ScrollView>
+      <View style={styles.container}>
+      <Image source={{ uri: user.profilePictureUrl }} style={styles.profilePicture} />
+      <Text style={styles.name}>{user.name}</Text>
+      <Text style={styles.email}>{user.gmail}</Text>
+      
       <View style={styles.detailsContainer}>
         <Text style={styles.label}>College:</Text>
-        <Text style={styles.detail}>{userProfile.college}</Text>
+        <Text style={styles.detail}>{user.college}</Text>
 
         <Text style={styles.label}>Course:</Text>
-        <Text style={styles.detail}>{userProfile.course}</Text>
+        <Text style={styles.detail}>{user.course}</Text>
 
         <Text style={styles.label}>Branch:</Text>
-        <Text style={styles.detail}>{userProfile.branch}</Text>
+        <Text style={styles.detail}>{user.branch}</Text>
 
         <Text style={styles.label}>Country:</Text>
-        <Text style={styles.detail}>{userProfile.country}</Text>
+        <Text style={styles.detail}>{user.country}</Text>
+
+        <Text style={styles.label}>State:</Text>
+        <Text style={styles.detail}>{user.state}</Text>
+
+        <Text style={styles.label}>City:</Text>
+        <Text style={styles.detail}>{user.city}</Text>
+
+        <Text style={styles.label}>Address:</Text>
+        <Text style={styles.detail}>{user.address}</Text>
+
+        <Text style={styles.label}>Contact Number:</Text>
+        <Text style={styles.detail}>{user.contactNumber}</Text>
+
+        <Text style={styles.label}>Bio:</Text>
+        <Text style={styles.detail}>{user.bio}</Text>
 
         <Text style={styles.label}>Admission Year:</Text>
-        <Text style={styles.detail}>{userProfile.admissionYear}</Text>
+        <Text style={styles.detail}>{user.admissionYear}</Text>
 
         <Text style={styles.label}>Passout Year:</Text>
-        <Text style={styles.detail}>{userProfile.passoutYear}</Text>
+        <Text style={styles.detail}>{user.passoutYear}</Text>
       </View>
     </View>
+    </ScrollView>
   );
 };
 

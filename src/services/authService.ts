@@ -30,7 +30,20 @@ class AuthService{
 
     async getUserById(id : string){
         try {
+            console.log("User Id : ", id);
             const {data} = await this.instance.get(`User/GetStudentDetails/${id}`);
+            console.log("User profile details fetched : ", data);
+            return data;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async getFacultyById(id : string){
+        try {
+            console.log("Faculty Id : ", id);
+            const {data} = await this.instance.get(`User/GetFacultyDetails/${id}`);
+            console.log("Faculty profile details fetched : ", data);
             return data;
         } catch (error) {
             console.error(error);
@@ -101,7 +114,7 @@ class AuthService{
             console.error(error);
         }
     }
-    
+   
  
 }
 
